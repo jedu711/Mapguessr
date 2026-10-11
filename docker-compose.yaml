@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: mapguessr-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pepper711
+      POSTGRES_DB: mapguessr
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./backend
+    container_name: mapguessr-backend
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: Pepper711
+      DB_NAME: mapguessr
+      DB_PORT: 5432
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./backend:/mapguessr
+
+volumes:
+  pgdata:
